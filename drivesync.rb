@@ -43,7 +43,7 @@ def print_help
   puts "  sync / no parameter - Start sync"
   puts "  config / -c - Opens the config file in your default text editor"
   puts "  diff - Prints a diff without syncing anything"
-  puts "  reset - Deletes local Drive folder, manifest and authorization, resetting your install (this should fix any sync problems)"
+  puts "  reset - manifest and authorization, resetting your install (this should fix any sync problems)"
   puts "  -v / version - Display software version"
   puts "  help / -h - Display this message"
 end

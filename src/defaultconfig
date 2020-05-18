@@ -1,9 +1,9 @@
 #Path for your local drive folder (absolute path)
-drive_path: "~/Documents/drive"
+drive_path: "/Volumes/DocumentsHD/google-drive/Family2"
 
 #If true, files that have been deleted locally will also be deleted on drive
 #Default: true
-allow_remote_deletion: true
+allow_remote_deletion: false
 
 #Determines what will be done if a file has been edited locally and remotely
 #keep_latest => Syncs whichever version has been edited last (default)
@@ -11,7 +11,8 @@ allow_remote_deletion: true
 #keep_local =>  Uploads the local version and overwrites remote changes
 #ignore => Does nothing and keeps both versions
 update_conflict_strategy: keep_latest
-
+keep_remote: true
+keep_local: true
 
 #Timeout threshold for the service in seconds. If a request takes longer
 #than this, it will be cancelled. You might want to increase this if you

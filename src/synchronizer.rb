@@ -103,7 +103,7 @@ class Synchronizer
   end
 
   def reset
-    puts "Resetting DriveSync will delete... \nLocal Drive folder: #{@config['drive_path']}"
+    puts "Resetting DriveSync will delete... \n"
     puts "Manifest file: #{MANIFEST_PATH}"
     puts "Google Drive Authorization: #{@drive.credentials_path}"
     puts "Proceed? (y/n)"
