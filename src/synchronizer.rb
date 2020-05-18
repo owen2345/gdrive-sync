@@ -114,7 +114,8 @@ class Synchronizer
       return
     end
 
-    paths = [@config['drive_path'], MANIFEST_PATH, MANIFEST_PATH_OLD, @drive.credentials_path]
+    # avoid removing drive_path
+    paths = [MANIFEST_PATH, MANIFEST_PATH_OLD, @drive.credentials_path]
     paths.each do |path|
       begin
         FileUtils.rm_r path if Helper::safe_path? path
@@ -148,17 +149,18 @@ class Synchronizer
     path = file.path.sub(file.path.split('/')[-1], '')
     FileUtils.mkdir_p File.join(@config['drive_path'], path)
 
-    drive.download file, File.join(@config['drive_path'], file.path)
+    # skip download file
+    # drive.download file, File.join(@config['drive_path'], file.path)
   end
 
   def delete_local_file path
     Log.log_message "Deleting file #{path} locally..."
-    FileUtils.rm(File.join @config['drive_path'], path)
+    # FileUtils.rm(File.join @config['drive_path'], path)
   end
 
   def delete_remote_file file, drive
     Log.log_message "Deleting file #{file.path} remotely"
-    drive.trash_file file
+    # drive.trash_file file
   end
 
   def upload_file path, drive
@@ -196,8 +198,8 @@ class Synchronizer
     Log.log_notice "Adding file #{path} to manifest"
 
     @manifest[path] = {}
-    @manifest[path]["remote_modified"] = file.modified_time.nil? ? file.created_time : file.modified_time.to_s
-    @manifest[path]["local_modified"] = File.mtime(File.join(@config['drive_path'], path)).to_datetime.to_s
+    @manifest[path]["remote_modified"] = Time.now #file.modified_time.nil? ? file.created_time : file.modified_time.to_s
+    @manifest[path]["local_modified"] = Time.now # File.mtime(File.join(@config['drive_path'], path)).to_datetime.to_s
     write_manifest MANIFEST_PATH
   end
 
@@ -237,44 +239,45 @@ class Synchronizer
 	end
 
 	def sync
-    #Check for updated remote or local files
-    @diff.both.each do |file|
-      latest_local = File.mtime(File.join(@config['drive_path'], file.path)).to_datetime
-      latest_remote = file.modified_time
-
-      #For whatever reason, file is found locally but wasn't written to manifest
-      if @manifest[file.path].nil?
-        Log.log_notice "#{file.path} was found on local Drive but not in manifest"
-        add_to_manifest file.path, file
-      end
-
-      stored_local = DateTime.parse @manifest[file.path]["local_modified"]
-      stored_remote = DateTime.parse @manifest[file.path]["remote_modified"]
-
-      #File has been modified remotely and locally. Resolve conflict according to selected strategy
-      if latest_local.is_after? stored_local and latest_remote.is_after? stored_remote
-        resolve_conflict file, @drive, latest_local, latest_remote
-        add_to_manifest file.path, file
-      elsif latest_local.is_after? stored_local
-        update_remote_file file, @drive
-        add_to_manifest file.path, file
-      elsif latest_remote.is_after? stored_remote
-        download_file file, @drive, true
-        add_to_manifest file.path, file
-      end
-    end
-
-	  @diff.remote_ahead.each do |file|
-      #New file on drive => Download
-	    if @manifest[file.path].nil?
-        download_file file, @drive
-        add_to_manifest file.path, file
-      #File has been deleted locally => Delete remotely or do nothing
-      elsif @config['allow_remote_deletion']
-        delete_remote_file file, @drive
-        remove_from_manifest file.path
-      end
-    end
+    # ## disable download files
+    # #Check for updated remote or local files
+    # @diff.both.each do |file|
+    #   latest_local = File.mtime(File.join(@config['drive_path'], file.path)).to_datetime
+    #   latest_remote = file.modified_time
+    #
+    #   #For whatever reason, file is found locally but wasn't written to manifest
+    #   if @manifest[file.path].nil?
+    #     Log.log_notice "#{file.path} was found on local Drive but not in manifest"
+    #     add_to_manifest file.path, file
+    #   end
+    #
+    #   stored_local = DateTime.parse @manifest[file.path]["local_modified"]
+    #   stored_remote = DateTime.parse @manifest[file.path]["remote_modified"]
+    #
+    #   #File has been modified remotely and locally. Resolve conflict according to selected strategy
+    #   if latest_local.is_after? stored_local and latest_remote.is_after? stored_remote
+    #     resolve_conflict file, @drive, latest_local, latest_remote
+    #     add_to_manifest file.path, file
+    #   elsif latest_local.is_after? stored_local
+    #     update_remote_file file, @drive
+    #     add_to_manifest file.path, file
+    #   elsif latest_remote.is_after? stored_remote
+    #     download_file file, @drive, true
+    #     add_to_manifest file.path, file
+    #   end
+    # end
+    #
+	  # @diff.remote_ahead.each do |file|
+    #   #New file on drive => Download
+	  #   if @manifest[file.path].nil?
+    #     download_file file, @drive
+    #     add_to_manifest file.path, file
+    #   #File has been deleted locally => Delete remotely or do nothing
+    #   elsif @config['allow_remote_deletion']
+    #     delete_remote_file file, @drive
+    #     remove_from_manifest file.path
+    #   end
+    # end
 
     @diff.local_ahead.each do |path|
       #New local file => Upload
@@ -283,8 +286,8 @@ class Synchronizer
         add_to_manifest path, drive_file
       #File has been deleted on drive => delete locally
       else
-        delete_local_file path
-        remove_from_manifest path
+        # delete_local_file path
+        # remove_from_manifest path
       end
     end
 
