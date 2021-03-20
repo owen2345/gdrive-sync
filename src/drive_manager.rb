@@ -87,12 +87,22 @@ class DriveManager
     @files.each {|file| file.path = resolve_path file}
     @files.reject!{|file| Helper.file_ignored? file.path, @config}
 
+    # count files per folder
+    folders.map {|folder| resolve_path(folder)}.each do |path|
+      puts "=======Remote files in (#{path}): #{files_in_folder(path).count}"
+    end
+
     Log.log_notice "Counted #{@files.count} remote files in #{folders.count} folders"
   end
 
   def find_by_path path
     return nil if @files.nil?
     @files.select{|file| file.path == path}.first
+  end
+
+  def files_in_folder(path)
+    return nil if @files.nil?
+    @files.select{|file| File.dirname(file.path) == path }
   end
 
   def download file, dest

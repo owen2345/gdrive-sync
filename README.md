@@ -17,6 +17,8 @@ When Ruby is installed, get drivesync:
 git clone https://github.com/MStadlmeier/drivesync.git
 cd drivesync
 bundle install
+ruby drivesync.rb config # to edit configuration
+ruby drivesync.rb # will print drive url for permissions and start uploading
 ````
 
 You can then run DriveSync with `ruby drivesync.rb`
