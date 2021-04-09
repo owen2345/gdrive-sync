@@ -123,7 +123,9 @@ class DriveManager
     remote_file.parents = [folder.id] unless folder.nil?
 
     fields = "id, name, mime_type, createdTime, modifiedTime"
-    @service.create_file(remote_file, fields: fields, upload_source: File.join(local_root, local_path))
+    file_path = File.join(local_root, local_path).to_s
+    content_type = File.extname(file_path).downcase.include?('mp4') ? 'video/mp4' : nil # fix mp4 videos not playable
+    @service.create_file(remote_file, fields: fields, upload_source: file_path, content_type: content_type)
   end
 
   def trash_file file
