@@ -1,4 +1,4 @@
-# DriveSync
+# DriveSync (Personal usage only)
 This is a fork from  https://github.com/MStadlmeier/drivesync.git
 
 ## Customizations
