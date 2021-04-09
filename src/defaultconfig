@@ -1,5 +1,5 @@
 #Path for your local drive folder (absolute path)
-drive_path: "/Volumes/DocumentsHD/google-drive/Family2"
+drive_path: "/Volumes/Documents/mis-documents/gdrive/"
 
 #If true, files that have been deleted locally will also be deleted on drive
 #Default: true
