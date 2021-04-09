@@ -279,7 +279,18 @@ class Synchronizer
     #   end
     # end
 
-    @diff.local_ahead.each do |path|
+    if ENV['REUPLOAD_EXT'] # Re-upload local files (update local files)
+      @diff.both.each do |g_file|
+        path = g_file.path
+        retry_ext = ENV['REUPLOAD_EXT'].downcase.split(',').any? { |ext| path.downcase.end_with?(ext) }
+        next if @manifest[path].nil? # not uploaded yet
+        next unless retry_ext # enabled ext
+
+        update_remote_file g_file, @drive
+      end
+    end
+
+    @diff.local_ahead.each do |path| # new local files
       #New local file => Upload
       if @manifest[path].nil?
         drive_file = upload_file path, @drive

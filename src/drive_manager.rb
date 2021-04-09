@@ -109,6 +109,7 @@ class DriveManager
     @service.get_file file.id, download_dest: dest
   end
 
+  # @param update_file: google file
   def upload local_root, local_path
     folder = nil
     #File is in sub-folder
@@ -121,11 +122,9 @@ class DriveManager
     remote_file = Google::Apis::DriveV3::File.new
     remote_file.name = local_path.split('/').last
     remote_file.parents = [folder.id] unless folder.nil?
-
     fields = "id, name, mime_type, createdTime, modifiedTime"
     file_path = File.join(local_root, local_path).to_s
-    content_type = File.extname(file_path).downcase.include?('mp4') ? 'video/mp4' : nil # fix mp4 videos not playable
-    @service.create_file(remote_file, fields: fields, upload_source: file_path, content_type: content_type)
+    @service.create_file(remote_file, fields: fields, upload_source: file_path, content_type: content_type_for(file_path))
   end
 
   def trash_file file
@@ -139,12 +138,18 @@ class DriveManager
 
   def update local_root, file
     return if file.nil?
+
+    file_path = File.join(local_root, file.path).to_s
     #Hack : This call returns a server error for mime type plain/text. Very likely a server bug
-    content_type = file.mime_type == "text/plain" ? "application/json" : file.mime_type
-    @service.update_file(file.id, content_type: content_type, upload_source: File.join(local_root, file.path))
+    content_type = content_type_for(file_path) || (file.mime_type == "text/plain" ? "application/json" : file.mime_type)
+    @service.update_file(file.id, content_type: content_type, upload_source: file_path)
   end
 
   private
+
+  def content_type_for(file_path) # fix mp4 videos not playable
+    File.extname(file_path).downcase.include?('mp4') ? 'video/mp4' : nil
+  end
 
   def resolve_path file
     return file.name if file.parents == nil || file.parents.count == 0
